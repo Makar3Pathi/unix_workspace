@@ -5,48 +5,52 @@
 #include <sys/un.h>
 #include <iostream>
 
-void initialize_socket(unsigned int &fd);
-
-class server {
+class u_socket
+{
     
-private:
-    unsigned int server_fd, client_fd;
-    struct sockaddr_un server_addr, client_addr;
-    socklen_t len;
-    bool is_up = false;
-    char buffer[];
+};
+
+class server
+{
     
 public:
-    server(std::string bind_path);
+    
+    server(const std::string& bind_path);
         
-    void get_connections();
+    void get_connections(); //change the name
     
 private:
     
+    unsigned int server_fd, client_fd;
+    sockaddr_un server_addr{}, client_addr{};
+    socklen_t len;
+    bool is_up = false;
+
     std::string extract_path();
 
     std::string collect_dir_info();
     
-    void send_message(std::string msg);
+    void send_message(const std::string& msg);
     
     void listen_for_connection();
     
     void receive_messages();
 };
 
-class client {
+class client
+{
+    
+public: //Public fields, methods should come first, even if there're private fields
+    client(const std::string& bind_path); //String objects should be passed by cost reference
+    
+    void get_dir_info(); //Change name: get - function's expected to return something
     
 private:
+    
     unsigned int client_fd;
     struct sockaddr_un server_addr;
     socklen_t len;
-    
-public:
-    client(std::string bind_path);
-    
-    void get_dir_info();
-    
-private:
+
     int connect_to_server();
     
     void request_data();
