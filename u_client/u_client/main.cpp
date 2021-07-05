@@ -1,8 +1,8 @@
 #include "useunix.hpp"
 int main(int argc, const char * argv[]) {
     
-    const char socket_path[256]  = "/Users/tripathi/Desktop/Sockets/tmp/u_socket";
+    const char socket_path[256]  = "/Users/makartripathi/Desktop/Sockets/tmp/u_socket";
     client cl = client(socket_path);
-    cl.get_dir_info();
+    cl.ask_for_dirinfo();
     return 0;
 }

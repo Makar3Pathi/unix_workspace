@@ -5,10 +5,42 @@
 #include <sys/un.h>
 #include <iostream>
 
+struct file_props
+{
+    std::string name;
+    std::string owner;
+    std::string group;
+    size_t size;
+};
+
+
+// MARK:- u_socket class:
+
 class u_socket
 {
+public:
+    u_socket();
+    
+    u_socket(int descriptor);
+    
+    u_socket(const u_socket& other);
+    
+    ~u_socket();
+    
+    int get_fd();
+    
+    u_socket& operator= (const u_socket& other) = delete;
+    
+    u_socket& operator= (u_socket&& other);
+    
+    u_socket& operator= (int descriptor);
+
+private:
+    int fd;
     
 };
+
+// MARK:- server class:
 
 class server
 {
@@ -16,48 +48,52 @@ class server
 public:
     
     server(const std::string& bind_path);
-        
-    void get_connections(); //change the name
+    
+    int start_accepting_connections();
     
 private:
     
-    unsigned int server_fd, client_fd;
+    u_socket server_fd, client_fd;
     sockaddr_un server_addr{}, client_addr{};
     socklen_t len;
     bool is_up = false;
-
+    
     std::string extract_path();
-
-    std::string collect_dir_info();
+        
+    int bind_socket();
     
-    void send_message(const std::string& msg);
+    int send_message(const std::string& msg);
     
-    void listen_for_connection();
+    int send_message(const std::vector<file_props>& info);
     
-    void receive_messages();
+    int listen_for_connection();
+    
+    int receive_messages();
 };
+
+// MARK:- client class:
 
 class client
 {
     
-public: //Public fields, methods should come first, even if there're private fields
-    client(const std::string& bind_path); //String objects should be passed by cost reference
+public:
+    client(const std::string& bind_path);
     
-    void get_dir_info(); //Change name: get - function's expected to return something
+    int ask_for_dirinfo();
     
 private:
     
-    unsigned int client_fd;
+    u_socket client_fd;
     struct sockaddr_un server_addr;
     socklen_t len;
-
+    
     int connect_to_server();
     
-    void request_data();
+    int request_data();
     
-    void parse_response();
+    int parse_response();
     
-    void close_client();
+    int close_client();
 };
 
 #endif /* useunix_hpp */
