@@ -20,19 +20,14 @@ class u_socket
 {
 public:
     u_socket();
-    
     u_socket(int descriptor);
-    
     u_socket(const u_socket& other);
-    
     ~u_socket();
     
     int get_fd();
     
     u_socket& operator= (const u_socket& other) = delete;
-    
     u_socket& operator= (u_socket&& other);
-    
     u_socket& operator= (int descriptor);
 
 private:
@@ -49,7 +44,7 @@ public:
     
     server(const std::string& bind_path);
     
-    int start_accepting_connections();
+    void start_accepting_connections();
     
 private:
     
@@ -60,15 +55,15 @@ private:
     
     std::string extract_path();
         
-    int bind_socket();
+    void bind_socket();
     
-    int send_message(const std::string& msg);
+    void send_message(const std::string& msg);
     
-    int send_message(const std::vector<file_props>& info);
+    void send_message(const std::vector<file_props>& info);
     
-    int listen_for_connection();
+    void listen_for_connection();
     
-    int receive_messages();
+    void receive_messages();
 };
 
 // MARK:- client class:
@@ -79,7 +74,7 @@ class client
 public:
     client(const std::string& bind_path);
     
-    int ask_for_dirinfo();
+    void ask_for_dirinfo();
     
 private:
     
@@ -87,13 +82,13 @@ private:
     struct sockaddr_un server_addr;
     socklen_t len;
     
-    int connect_to_server();
+    void connect_to_server();
     
-    int request_data();
+    void request_data();
     
-    int parse_response();
+    void parse_response();
     
-    int close_client();
+    void close_client();
 };
 
 #endif /* useunix_hpp */
