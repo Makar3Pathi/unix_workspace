@@ -5,49 +5,84 @@
 #include <sys/un.h>
 #include <iostream>
 
-void initialize_socket(unsigned int &fd);
+struct file_props
+{
+    std::string name;
+    std::string owner;
+    std::string group;
+    size_t size;
+};
 
-class server {
+
+// MARK:- u_socket class:
+
+class u_socket
+{
+public:
+    u_socket();
+    u_socket(int descriptor);
+    u_socket(const u_socket& other);
+    ~u_socket();
     
+    int get_fd();
+    
+    u_socket& operator= (const u_socket& other) = delete;
+    u_socket& operator= (u_socket&& other);
+    u_socket& operator= (int descriptor);
+
 private:
-    unsigned int server_fd, client_fd;
-    struct sockaddr_un server_addr, client_addr;
-    socklen_t len;
-    bool is_up = false;
-    char buffer[];
+    int fd;
+    
+};
+
+// MARK:- server class:
+
+class server
+{
     
 public:
-    server(std::string bind_path);
-        
-    void get_connections();
+    
+    server(const std::string& bind_path);
+    
+    void start_accepting_connections();
     
 private:
     
-    std::string extract_path();
-
-    std::string collect_dir_info();
+    u_socket server_fd, client_fd;
+    sockaddr_un server_addr{}, client_addr{};
+    socklen_t len;
+    bool is_up = false;
     
-    void send_message(std::string msg);
+    std::string extract_path();
+        
+    void bind_socket();
+    
+    void send_message(const std::string& msg);
+    
+    void send_message(const std::vector<file_props>& info);
     
     void listen_for_connection();
     
     void receive_messages();
 };
 
-class client {
+// MARK:- client class:
+
+class client
+{
+    
+public:
+    client(const std::string& bind_path);
+    
+    void ask_for_dirinfo();
     
 private:
-    unsigned int client_fd;
+    
+    u_socket client_fd;
     struct sockaddr_un server_addr;
     socklen_t len;
     
-public:
-    client(std::string bind_path);
-    
-    void get_dir_info();
-    
-private:
-    int connect_to_server();
+    void connect_to_server();
     
     void request_data();
     
